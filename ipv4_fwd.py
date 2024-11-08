@@ -17,12 +17,12 @@ def fwd(p,dst):
 def drop ():
     packet["egress_port"] = 511
     
-ipv4_fwd = Table([32], [fwd, drop], drop)
+ipv4_fwd = Table(["ipv4.dst"], [fwd, drop], drop)
 
 def pipeline(pkt):
     global packet
     packet = pkt
-    ipv4_fwd.apply(packet["ipv4.dst"])
+    ipv4_fwd.apply()
     if packet["egress_port"] == 511:
         print ("packet dropped")
         return None
