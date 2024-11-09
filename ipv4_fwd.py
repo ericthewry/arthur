@@ -1,6 +1,11 @@
 from table import *
 
-packet = {}
+packet = {"ipv4.dst" : 8888,
+          "eth.dst" : 47
+          }
+
+e1 = Entry([ExactMatch(8888)], "fwd", (88, 77), 0)
+e2 = Entry([ExactMatch(9999)], "fwd", (99, 1), 104)
 
 def set_port (p):
     packet["egress_port"] = p
@@ -17,7 +22,7 @@ def fwd(p,dst):
 def drop ():
     packet["egress_port"] = 511
     
-ipv4_fwd = Table(["ipv4.dst"], [fwd, drop], drop)
+ipv4_fwd = Table(packet, ["ipv4.dst"], {"fwd" : fwd, "drop": drop}, "drop")
 
 def pipeline(pkt):
     global packet

@@ -21,11 +21,15 @@ def rewrite(dst):
 def drop ():
     packet["egress_port"] = 511
     
-ipv4_set_port = Table([32], [set_port, drop], drop)
-ipv4_rewrites = Table([32], [rewrite, drop], drop)
+ipv4_set_port = Table(packet, ["ipv4.dst"], {"set_port": set_port, "drop": drop}, "drop")
+ipv4_rewrites = Table(packet, ["ipv4.dst"], {"rewrite": rewrite, "drop": drop}, "drop")
 
 def pipeline(pkt):
     packet = pkt
-    ipv4_set_port.apply(packet["ipv4.dst"])
-    ipv4_rewrites.apply(packet["ipv4.dst"])
+    ipv4_set_port.apply()
+    ipv4_rewrites.apply()
+    if packet["egress_port"] == 511:
+        print("packet dropped")
+    else:
+        return packet
 
